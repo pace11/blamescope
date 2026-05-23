@@ -1,0 +1,78 @@
+{
+  "name": "@pace11/blamescope",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Component-level git blame overlay for React + Vite projects",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./plugin": {
+      "import": "./dist/plugin.js",
+      "types": "./dist/plugin.d.ts"
+    },
+    "./server": "./dist/server.js"
+  },
+  "bin": {
+    "blamescope": "./dist/server.js"
+  },
+  "author": "Mhd Iriansyah <rppratama1771@gmail.com> (https://www.pace11.my.id/)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pace11/blamescope.git"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "git",
+    "blame",
+    "overlay",
+    "react",
+    "vite",
+    "development",
+    "tooling"
+  ],
+  "scripts": {
+    "dev": "node src/server.js & vite",
+    "dev:pkg": "tsup --watch",
+    "build:pkg": "tsup",
+    "build:demo": "tsc -b && vite build --outDir demo-dist",
+    "preview": "vite preview --outDir demo-dist",
+    "lint": "eslint ."
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "vite": ">=5"
+  },
+  "dependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/plugin-syntax-jsx": "^7.28.6",
+    "@babel/plugin-syntax-typescript": "^7.28.6",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "magic-string": "^0.30.21"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/babel__core": "^7.20.5",
+    "@types/node": "^24.12.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "tsup": "^8.5.1",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.59.2",
+    "vite": "^8.0.12"
+  }
+}
