@@ -8,6 +8,10 @@ Component-level git blame overlay for React + Vite projects.
 
 Hover over any React component in your browser during development to instantly see who last touched it, when, and what the commit message was — without leaving your app.
 
+<div align="center">
+  <img src="./public/blamescope.gif" alt="Blamescope demo" width="700" />
+</div>
+
 ## How it works
 
 1. **Vite plugin** — auto-injects a `data-blamescope` attribute onto the root JSX element of every React component at build time (dev only).
