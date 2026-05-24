@@ -3,6 +3,25 @@ import cors from "cors";
 import { execFileSync } from "child_process";
 import path from "path";
 
+/**
+ * Parse a git remote URL (SSH or HTTPS) into a plain HTTPS base URL.
+ * e.g. git@github.com:user/repo.git  →  https://github.com/user/repo
+ *      https://github.com/user/repo.git  →  https://github.com/user/repo
+ */
+function parseRemoteUrl(raw) {
+  const trimmed = raw.trim();
+  // SSH format: git@host:user/repo.git
+  const sshMatch = trimmed.match(/^git@([^:]+):(.+?)(\.git)?$/);
+  if (sshMatch) return `https://${sshMatch[1]}/${sshMatch[2]}`;
+  // HTTPS format
+  try {
+    const url = new URL(trimmed);
+    return `${url.origin}${url.pathname.replace(/\.git$/, "")}`;
+  } catch {
+    return null;
+  }
+}
+
 const app = express();
 
 app.use(cors());
@@ -53,6 +72,27 @@ app.get("/ownership", (req, res) => {
       { encoding: "utf-8" }
     );
 
+    const commitHashFull = execFileSync(
+      "git",
+      ["log", "-1", "--pretty=format:%H", "--", file],
+      { encoding: "utf-8" }
+    );
+
+    let commitUrl = null;
+    try {
+      const remoteRaw = execFileSync(
+        "git",
+        ["remote", "get-url", "origin"],
+        { encoding: "utf-8" }
+      );
+      const repoBase = parseRemoteUrl(remoteRaw);
+      if (repoBase && commitHashFull) {
+        commitUrl = `${repoBase}/commit/${commitHashFull.trim()}`;
+      }
+    } catch {
+      // no remote configured — commitUrl stays null
+    }
+
     const latestEmail = execFileSync(
       "git",
       ["log", "-1", "--pretty=format:%ae", "--", file],
@@ -82,7 +122,7 @@ app.get("/ownership", (req, res) => {
       })                                                  
       .filter(Boolean);                                            
 
-    res.json({ file, latestCommit, latestAuthor, latestDate, commitHash, latestEmail, totalCommits, contributors });
+    res.json({ file, latestCommit, latestAuthor, latestDate, commitHash, commitUrl, latestEmail, totalCommits, contributors });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to retrieve blame info" });
