@@ -7,9 +7,9 @@ import { blameScopePlugin } from './src/plugin'
 export default defineConfig({
   plugins: [blameScopePlugin(), react()],
   resolve: {
-    // Allows demo/ to import from 'blamescope' just like a real consumer would
+    // Allows demo/ to import from '@pace11/blamescope' just like a real consumer would
     alias: {
-      blamescope: path.resolve(__dirname, 'src/index.ts'),
+      '@pace11/blamescope': path.resolve(__dirname, 'src/index.ts'),
     },
   },
 })

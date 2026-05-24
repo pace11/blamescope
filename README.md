@@ -16,12 +16,12 @@ Hover over any React component in your browser during development to instantly s
 
 1. **Vite plugin** — auto-injects a `data-blamescope` attribute onto the root JSX element of every React component at build time (dev only).
 2. **Local server** — a small Express server on port `4317` queries `git log` for a given file and returns blame metadata.
-3. **`<BlameOverlay />`** — a React component that listens to `mousemove`, finds the nearest `data-blamescope` element, calls the local server, and renders a tooltip with author, date, commit message, and contributor list.
+3. **`<BlameOverlay />`** — a React component that listens to `mousemove`, finds the nearest `data-blamescope` element, calls the local server, and renders a tooltip with author, date, commit message, contributor list, and a clickable commit hash that links to the remote commit.
 
 ## Installation
 
 ```bash
-npm install -D blamescope
+npm install -D @pace11/blamescope
 ```
 
 > **Peer requirements:** React ≥ 18, Vite ≥ 5. Your project must be a git repository.
@@ -48,7 +48,7 @@ export default defineConfig({
 Render `<BlameOverlay />` once near the root of your app (e.g. in `App.tsx`):
 
 ```tsx
-import { BlameOverlay } from 'blamescope'
+import { BlameOverlay } from '@pace11/blamescope'
 
 export default function App() {
   return (
@@ -86,17 +86,18 @@ Or add both to a single npm script:
 
 - **Hover** over any component in the browser — a tooltip appears with:
   - Latest commit message, author, and relative date
-  - Commit hash
+  - Commit hash (clickable — opens the commit on GitHub/GitLab/Bitbucket in a new tab)
   - Total commits and contributor breakdown
 - **Hold `Alt`** to pin the tooltip so you can select and copy text.
 - **Press `Escape`** to unpin.
+- A **status banner** is always visible at the bottom center of the window indicating blamescope is active.
 
 ## Manual annotation with `withBlame`
 
 The Vite plugin auto-detects named function components. For components it cannot reach (anonymous functions, `React.forwardRef`, etc.), use the `withBlame` HOC:
 
 ```tsx
-import { withBlame } from 'blamescope'
+import { withBlame } from '@pace11/blamescope'
 
 const Button = withBlame(
   React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => (
@@ -114,7 +115,44 @@ Vite plugin. Accepts an optional `root` path (defaults to `process.cwd()`). Must
 
 ### `<BlameOverlay />`
 
-React component. Renders the hover tooltip. No props required. Mount once per app.
+React component. Renders the status banner and hover tooltip. Mount once per app.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `theme` | `ThemeName \| BlameTheme` | `"default"` | Preset theme name or a custom theme object |
+
+#### Preset themes
+
+| Name | Inspired by |
+|---|---|
+| `"default"` | Dark blue-grey |
+| `"github"` | GitHub dark |
+| `"gitlab"` | GitLab dark |
+| `"bitbucket"` | Bitbucket dark |
+| `"aws"` | AWS Console dark |
+| `"google"` | Google Material dark |
+
+```tsx
+// use a preset
+<BlameOverlay theme="github" />
+
+// or define a fully custom theme
+import type { BlameTheme } from '@pace11/blamescope'
+
+const myTheme: BlameTheme = {
+  background: '#1a1a1a',
+  backgroundSecondary: '#2a2a2a',
+  border: '#333',
+  borderPinned: '#ff6b6b',
+  text: '#fff',
+  textMuted: '#aaa',
+  textFaint: '#666',
+  accent: '#ff6b6b',
+  pinActive: '#ff6b6b',
+}
+
+<BlameOverlay theme={myTheme} />
+```
 
 ### `withBlame(Component, meta)`
 
@@ -134,7 +172,9 @@ The server listens on `http://localhost:4317` and exposes:
 GET /ownership?file=<relative-path>
 ```
 
-Returns JSON with `latestCommit`, `latestAuthor`, `latestDate`, `commitHash`, `latestEmail`, `totalCommits`, and `contributors`.
+Returns JSON with `latestCommit`, `latestAuthor`, `latestDate`, `commitHash`, `commitUrl`, `latestEmail`, `totalCommits`, and `contributors`.
+
+- `commitUrl` — full URL to the commit on the remote (e.g. `https://github.com/user/repo/commit/<hash>`). `null` if no remote is configured.
 
 ## Notes
 

@@ -1,6 +1,6 @@
 {
   "name": "@pace11/blamescope",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Component-level git blame overlay for React + Vite projects",
   "exports": {

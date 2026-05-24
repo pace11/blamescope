@@ -19,7 +19,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@pace11/blamescope": ["./src/index.ts"],
+      "@pace11/blamescope/plugin": ["./src/plugin.ts"]
+    }
   },
   "include": ["src", "demo"]
 }
