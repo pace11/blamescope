@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.3.0] - 2026-05-25
+
+### ✨ New Features
+
+- **Next.js App Router support** — use `withBlamescope` in `next.config.ts/js` and mount `<BlameOverlay />` via a `"use client"` wrapper in your root layout.
+- **Next.js Pages Router support** — same `withBlamescope` setup; mount `<BlameOverlay />` directly in `_app.tsx`. Added a CJS build (`dist/index.cjs`) exposed via the `require` export condition so webpack (Pages Router) resolves the correct module and avoids duplicate React instance issues.
+
+### 📦 Build
+
+- Added CJS format to the client bundle in `tsup.config.ts`, outputting `dist/index.cjs`
+- Updated `package.json` exports for `.` to include `"require": "./dist/index.cjs"` with `types` first per Node.js convention
+
+### 📝 Docs
+
+- README: updated Roadmap section to reflect current support status (Vite, Remix/React Router v7, Next.js App Router, Next.js Pages Router all ✅)
+- README: updated Current limitations to reflect multi-framework support
+- README: refreshed intro description
+
+---
+
 ## [0.2.0] - 2026-05-25
 
 ### ✨ New Features
