@@ -8,6 +8,10 @@ Component-level git blame overlay for React + Vite projects.
 
 Hover over any React component in your browser during development to instantly see who last touched it, when, and what the commit message was — without leaving your app.
 
+[![npm version](https://img.shields.io/npm/v/%40pace11%2Fblamescope.svg?style=flat-square)](https://www.npmjs.com/package/@pace11/blamescope)
+[![Build status](https://github.com/pace11/blamescope/actions/workflows/publish.yml/badge.svg)](https://github.com/pace11/blamescope/actions/workflows/publish.yml)
+[![npm downloads](https://img.shields.io/npm/dm/%40pace11%2Fblamescope.svg?style=flat-square)](https://npm-stat.com/charts.html?package=%40pace11%2Fblamescope)
+
 <div align="center">
   <img src="./public/blamescope.gif" alt="Blamescope demo" width="700" />
 </div>
