@@ -1,16 +1,22 @@
 {
   "name": "@pace11/blamescope",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
-  "description": "Component-level git blame overlay for React + Vite projects",
+  "description": "Component-level git blame overlay for React projects (Vite & Next.js)",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
     },
     "./plugin": {
       "import": "./dist/plugin.js",
       "types": "./dist/plugin.d.ts"
+    },
+    "./next": {
+      "types": "./dist/next.d.ts",
+      "require": "./dist/next.cjs",
+      "import": "./dist/next.js"
     },
     "./server": "./dist/server.js"
   },
@@ -33,6 +39,10 @@
     "overlay",
     "react",
     "vite",
+    "nextjs",
+    "next",
+    "app-router",
+    "pages-router",
     "development",
     "tooling"
   ],
@@ -47,7 +57,16 @@
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18",
-    "vite": ">=5"
+    "vite": ">=5",
+    "next": ">=13"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@babel/core": "^7.29.0",

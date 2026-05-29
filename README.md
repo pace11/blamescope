@@ -4,9 +4,9 @@
 <img src="./public//blamescop.png" alt="app-icon" style="text-align:center" />
 </div>
 
-Component-level git blame overlay for React + Vite projects.
+Component-level git blame overlay for React projects (Vite & Next.js).
 
-Hover over any React component in your browser during development to instantly see who last touched it, when, and what the commit message was — without leaving your app.
+Ever stared at a broken component and thought *"who wrote this??"* — only to realize it was you, three weeks ago? Blamescope has your back (and your receipts). Hover over any React component during development to instantly see who last touched it, when, and what the commit message said — all without leaving your browser. Use it for context, not for pointing fingers. 🙂
 
 [![npm version](https://img.shields.io/npm/v/%40pace11%2Fblamescope.svg?style=flat-square)](https://www.npmjs.com/package/@pace11/blamescope)
 [![Build status](https://github.com/pace11/blamescope/actions/workflows/publish.yml/badge.svg)](https://github.com/pace11/blamescope/actions/workflows/publish.yml)
@@ -35,9 +35,19 @@ pnpm install -D @pace11/blamescope
 yarn add -D @pace11/blamescope
 ```
 
-> **Peer requirements:** React ≥ 18, Vite ≥ 5. Your project must be a git repository.
+> **Peer requirements:** React ≥ 18. Vite ≥ 5 **or** Next.js ≥ 13. Your project must be a git repository.
 
 ## Setup
+
+Choose the setup guide for your framework:
+
+- [Vite + React](#vite--react)
+- [Next.js (App Router)](#nextjs-app-router)
+- [Next.js (Pages Router)](#nextjs-pages-router)
+
+---
+
+## Vite + React
 
 ### 1. Add the Vite plugin
 
@@ -47,7 +57,7 @@ In `vite.config.ts`, add `blameScopePlugin()` **before** the React plugin:
 // vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { blameScopePlugin } from 'blamescope/plugin'
+import { blameScopePlugin } from '@pace11/blamescope/plugin'
 
 export default defineConfig({
   plugins: [blameScopePlugin(), react()],
@@ -93,6 +103,109 @@ Or add both to a single npm script:
 }
 ```
 
+---
+
+## Next.js (App Router)
+
+### 1. Wrap your Next.js config
+
+```ts
+// next.config.ts
+import type { NextConfig } from 'next'
+import { withBlamescope } from '@pace11/blamescope/next'
+
+const nextConfig: NextConfig = { /* your existing config */ }
+
+export default withBlamescope(nextConfig)
+```
+
+CJS (`next.config.js`) works too:
+
+```js
+// next.config.js
+const { withBlamescope } = require('@pace11/blamescope/next')
+
+module.exports = withBlamescope({ /* your existing config */ })
+```
+
+### 2. Mount `<BlameOverlay />` in your root layout
+
+Because `BlameOverlay` uses browser APIs, create a thin client wrapper and render it from your root layout:
+
+```tsx
+// app/BlameOverlayClient.tsx
+'use client'
+import { BlameOverlay } from '@pace11/blamescope'
+export default BlameOverlay
+```
+
+```tsx
+// app/layout.tsx
+import BlameOverlayClient from './BlameOverlayClient'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        {process.env.NODE_ENV === 'development' && <BlameOverlayClient />}
+      </body>
+    </html>
+  )
+}
+```
+
+### 3. Start the blame server
+
+```bash
+# in one terminal
+npx blamescope
+
+# in another terminal
+next dev
+```
+
+Or in a single npm script:
+
+```json
+"scripts": {
+  "dev": "blamescope & next dev"
+}
+```
+
+---
+
+## Next.js (Pages Router)
+
+### 1. Wrap your Next.js config
+
+Same as App Router — use `withBlamescope` in `next.config.ts/js` (see above).
+
+### 2. Mount `<BlameOverlay />` in `_app.tsx`
+
+```tsx
+// pages/_app.tsx
+import type { AppProps } from 'next/app'
+import { BlameOverlay } from '@pace11/blamescope'
+
+export default function App({ Component, pageProps }: AppProps) {
+  return (
+    <>
+      <Component {...pageProps} />
+      {process.env.NODE_ENV === 'development' && <BlameOverlay />}
+    </>
+  )
+}
+```
+
+### 3. Start the blame server
+
+```bash
+npx blamescope & next dev
+```
+
+---
+
 ## Usage
 
 - **Hover** over any component in the browser — a tooltip appears with:
@@ -123,6 +236,10 @@ const Button = withBlame(
 ### `blameScopePlugin(root?: string)`
 
 Vite plugin. Accepts an optional `root` path (defaults to `process.cwd()`). Must be placed **before** the React plugin in the `plugins` array.
+
+### `withBlamescope(nextConfig?)`
+
+Next.js config wrapper. Adds a webpack loader that injects `data-blamescope` during `next dev`. Supports both App Router and Pages Router. Import from `@pace11/blamescope/next`.
 
 ### `<BlameOverlay />`
 
@@ -195,12 +312,14 @@ Returns JSON with `latestCommit`, `latestAuthor`, `latestDate`, `commitHash`, `c
 
 ## Current limitations
 
-Blamescope v0.1 only supports **React + Vite** projects. The Vite plugin relies on Babel to parse JSX/TSX and MagicString to inject attributes, so it is tightly coupled to the Vite build pipeline. Other setups are not supported yet.
+Blamescope is intended for **development only** and currently supports React-based projects on Vite and Next.js (both App Router and Pages Router). Vue and Svelte support is not available yet.
 
 ## Roadmap
 
-The following integrations are planned for future releases:
-- **Remix / React Router v7** — same plugin approach adapted for Vite-based Remix projects (Can be used almost directly, with little to no modification ✅)
-- **Next.js** — webpack/Turbopack plugin variant that injects `data-blamescope` during the Next.js build ⏳
-- **Vue 3** — Vite plugin that injects blame attributes on the root element of single-file components (`.vue`) ⏳
-- **Svelte** — preprocessor that annotates component root nodes ⏳
+Current support status:
+- **Vite + React** — full support ✅
+- **Remix / React Router v7** — Vite-based projects supported ✅
+- **Next.js App Router** — webpack loader + `withBlamescope` wrapper supported ✅
+- **Next.js Pages Router** — webpack loader + `withBlamescope` wrapper supported ✅
+- **Vue 3** — Vite plugin for single-file components (`.vue`) ⏳
+- **Svelte** — preprocessor for component root nodes ⏳
