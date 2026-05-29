@@ -25,7 +25,14 @@ Hover over any React component in your browser during development to instantly s
 ## Installation
 
 ```bash
+# npm
 npm install -D @pace11/blamescope
+
+# pnpm
+pnpm install -D @pace11/blamescope
+
+# yarn
+yarn add -D @pace11/blamescope
 ```
 
 > **Peer requirements:** React ≥ 18, Vite ≥ 5. Your project must be a git repository.
