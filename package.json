@@ -1,8 +1,10 @@
 {
   "name": "@pace11/blamescope",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "description": "Component-level git blame overlay for React projects (Vite & Next.js)",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
