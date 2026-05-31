@@ -212,6 +212,7 @@ npx blamescope & next dev
   - Latest commit message, author, and relative date
   - Commit hash (clickable — opens the commit on GitHub/GitLab/Bitbucket in a new tab)
   - Total commits and contributor breakdown
+- **`triggerMode="icon"`** — instead of showing the tooltip on every component hover, a small `i` badge appears inside the top-right corner of the hovered component; the tooltip only shows when you hover the badge.
 - **Hold `Alt`** to pin the tooltip so you can select and copy text.
 - **Press `Escape`** to unpin.
 - A **status banner** is always visible at the bottom center of the window indicating blamescope is active.
@@ -248,6 +249,7 @@ React component. Renders the status banner and hover tooltip. Mount once per app
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `theme` | `ThemeName \| BlameTheme` | `"default"` | Preset theme name or a custom theme object |
+| `triggerMode` | `"hover" \| "icon"` | `"hover"` | `"hover"` shows the tooltip on any component hover; `"icon"` shows a small `i` badge inside the component and only reveals the tooltip when the badge is hovered |
 
 #### Preset themes
 

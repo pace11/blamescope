@@ -106,6 +106,12 @@ type ActiveTarget = {
   y: number;
 };
 
+type IconTarget = {
+  file: string;
+  component: string;
+  rect: { top: number; right: number; bottom: number };
+};
+
 const SERVER_URL = "http://localhost:4317";
 const cache = new Map<string, BlameInfo>();
 
@@ -124,13 +130,21 @@ async function fetchBlame(file: string): Promise<BlameInfo | null> {
   }
 }
 
-export function BlameOverlay({ theme: themeProp = "default" }: { theme?: ThemeName | BlameTheme } = {}) {
+export function BlameOverlay({
+  theme: themeProp = "default",
+  triggerMode = "hover",
+}: {
+  theme?: ThemeName | BlameTheme;
+  triggerMode?: "hover" | "icon";
+} = {}) {
   const t: BlameTheme = typeof themeProp === "string" ? (themes[themeProp as ThemeName] ?? themes.default) : themeProp;
   const [active, setActive] = useState<ActiveTarget | null>(null);
   const [blame, setBlame] = useState<BlameInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [pinned, setPinned] = useState(false);
+  const [iconTarget, setIconTarget] = useState<IconTarget | null>(null);
   const pinnedRef = React.useRef(false);
+  const iconHoveredRef = React.useRef(false);
 
   // Alt key → pin overlay so text can be selected/copied
   useEffect(() => {
@@ -151,11 +165,25 @@ export function BlameOverlay({ theme: themeProp = "default" }: { theme?: ThemeNa
         pinnedRef.current = false;
       }
     };
+    const onBlur = () => {
+      if (pinnedRef.current) return;
+      setActive(null);
+      setIconTarget(null);
+    };
+    const onMouseLeaveDoc = () => {
+      if (pinnedRef.current) return;
+      setActive(null);
+      setIconTarget(null);
+    };
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", onBlur);
+    document.addEventListener("mouseleave", onMouseLeaveDoc);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", onBlur);
+      document.removeEventListener("mouseleave", onMouseLeaveDoc);
     };
   }, []);
 
@@ -164,27 +192,44 @@ export function BlameOverlay({ theme: themeProp = "default" }: { theme?: ThemeNa
       if (pinnedRef.current) return; // frozen while Alt held
       const el = (e.target as HTMLElement).closest("[data-blamescope]");
 
-      if (!el) {
-        setActive(null);
-        return;
-      }
-
-      try {
-        const parsed = JSON.parse(el.getAttribute("data-blamescope")!);
-        setActive({
-          file: parsed.file ?? "",
-          component: parsed.component ?? "Unknown",
-          x: e.clientX + 16,
-          y: e.clientY + 16,
-        });
-      } catch {
-        setActive(null);
+      if (triggerMode === "icon") {
+        if (!el) {
+          if (!iconHoveredRef.current) setIconTarget(null);
+          return;
+        }
+        try {
+          const parsed = JSON.parse(el.getAttribute("data-blamescope")!);
+          const rect = (el as HTMLElement).getBoundingClientRect();
+          setIconTarget({
+            file: parsed.file ?? "",
+            component: parsed.component ?? "Unknown",
+            rect: { top: rect.top, right: rect.right, bottom: rect.bottom },
+          });
+        } catch {
+          if (!iconHoveredRef.current) setIconTarget(null);
+        }
+      } else {
+        if (!el) {
+          setActive(null);
+          return;
+        }
+        try {
+          const parsed = JSON.parse(el.getAttribute("data-blamescope")!);
+          setActive({
+            file: parsed.file ?? "",
+            component: parsed.component ?? "Unknown",
+            x: e.clientX + 16,
+            y: e.clientY + 16,
+          });
+        } catch {
+          setActive(null);
+        }
       }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  }, [triggerMode]);
 
   useEffect(() => {
     if (!active) {
@@ -249,8 +294,49 @@ export function BlameOverlay({ theme: themeProp = "default" }: { theme?: ThemeNa
             flexShrink: 0,
           }}
         />
-        <span>blamescope active - hover a component</span>
+        <span>blamescope active — {triggerMode === "icon" ? "hover the ⓘ icon on a component" : "hover a component"}</span>
       </div>
+
+      {/* ── Icon badge (icon mode only) ── */}
+      {triggerMode === "icon" && iconTarget && (
+        <div
+          style={{
+            position: "fixed",
+            top: iconTarget.rect.top + 4,
+            left: iconTarget.rect.right - 24,
+            zIndex: 999999,
+            cursor: "pointer",
+            background: t.backgroundSecondary,
+            color: t.accent,
+            border: `1px solid ${t.border}`,
+            borderRadius: "50%",
+            width: 20,
+            height: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 12,
+            fontFamily: "monospace",
+            userSelect: "none",
+          }}
+          onMouseEnter={() => {
+            iconHoveredRef.current = true;
+            setActive({
+              file: iconTarget.file,
+              component: iconTarget.component,
+              x: iconTarget.rect.right + 8,
+              y: iconTarget.rect.top,
+            });
+          }}
+          onMouseLeave={() => {
+            if (pinnedRef.current) return;
+            iconHoveredRef.current = false;
+            setActive(null);
+          }}
+        >
+          i
+        </div>
+      )}
 
       {/* ── Tooltip ── */}
       {active && (

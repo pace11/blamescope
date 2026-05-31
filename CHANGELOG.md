@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.0] - 2026-05-31
+
+### ✨ New Features
+
+- **`triggerMode` prop on `<BlameOverlay />`** — choose how the blame tooltip is triggered:
+  - `"hover"` *(default)* — existing behaviour, tooltip appears when hovering any annotated component.
+  - `"icon"` — a small `i` badge is rendered inside the top-right corner of the hovered component the tooltip only appears when the badge itself is hovered. Useful when you want less visual noise during normal development.
+
+### 🐛 Bug Fixes
+
+- Overlay now hides when the browser window loses focus (e.g. switching to another application).
+- Overlay now hides when the mouse leaves the browser page entirely (e.g. moving to the URL bar or browser).
+- Fixed `Dynamic require of "@babel/plugin-syntax-typescript" is not supported` error that occurred in Vite ESM environments Babel syntax plugins are now loaded via static `import` instead of `require()`.
+- Fixed TypeScript "could not find declaration file" error in consumer projects using `moduleResolution: "node"` added top-level `main` and `types` fields to `package.json`.
+
+---
+
 ## [0.3.0] - 2026-05-25
 
 ### ✨ New Features

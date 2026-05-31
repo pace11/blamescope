@@ -1,12 +1,10 @@
 import * as babel from "@babel/core";
 import MagicString from "magic-string";
 import path from "path";
-
-// These packages ship no type declarations — require() avoids implicit-any errors.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const babelPluginSyntaxTypescript = require("@babel/plugin-syntax-typescript");
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const babelPluginSyntaxJsx = require("@babel/plugin-syntax-jsx");
+// @ts-expect-error — no type declarations available
+import babelPluginSyntaxTypescript from "@babel/plugin-syntax-typescript";
+// @ts-expect-error — no type declarations available
+import babelPluginSyntaxJsx from "@babel/plugin-syntax-jsx";
 
 export type Injection = {
   offset: number;
