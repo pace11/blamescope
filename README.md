@@ -1,7 +1,5 @@
-# 👉 Blamescope
-
 <div align="center">
-<img src="./public//blamescop.png" alt="app-icon" style="text-align:center" />
+  <img src="./public//blamescope.png" width="160" alt="app-icon" style="text-align:center" />
 </div>
 
 Component-level git blame overlay for React projects (Vite & Next.js).
